@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,5 +27,12 @@ public class RestExceptionHandler {
                 .forEach(erro -> campos.put(erro.getField(), erro.getDefaultMessage()));
         return ResponseEntity.badRequest()
                 .body(new ErroResposta("dados inválidos", campos));
+    }
+
+    // JSON malformado ou valor de enum inexistente (ex.: prioridade "URGENTE")
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErroResposta> corpoInvalido(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest()
+                .body(ErroResposta.de("corpo da requisição inválido ou valor não aceito"));
     }
 }
