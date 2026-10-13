@@ -117,4 +117,22 @@ class TarefaApiTests {
         mvc.perform(get("/tarefas/{id}", id))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void atualizaTarefaInexistenteRetorna404() throws Exception {
+        mvc.perform(put("/tarefas/9999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"titulo\":\"qualquer\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.erro").exists());
+    }
+
+    @Test
+    void prioridadeInvalidaRetorna400() throws Exception {
+        mvc.perform(post("/tarefas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"titulo\":\"x\",\"prioridade\":\"URGENTE\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro").exists());
+    }
 }
